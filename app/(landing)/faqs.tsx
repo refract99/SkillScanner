@@ -1,44 +1,49 @@
+const faqs = [
+    {
+        q: 'What is an AI agent skill?',
+        a: 'Skills are instruction files (like SKILL.md or .mdc rules) that extend AI coding agents such as Claude Code, Cursor, Windsurf, and Cline. They can access your filesystem, shell, environment variables, and API keys.',
+    },
+    {
+        q: 'Does SkillScanner execute any code?',
+        a: 'No. All analysis is strictly read-only. The repository is downloaded into an isolated temp directory, scanned as text, and immediately deleted.',
+    },
+    {
+        q: 'How does the AI review work?',
+        a: 'SkillScanner uses an AI-first architecture. The skill files are sent directly to an LLM along with structured review documents covering 10 threat categories. The AI performs semantic analysis — understanding context, data flow, and intent — rather than just matching patterns. Deterministic hard-stop checks run separately to catch always-bad patterns like reverse shells and zero-width characters.',
+    },
+    {
+        q: 'What happens if the AI is unavailable?',
+        a: 'If the AI analysis fails, only hard-stop findings are shown. For legitimate skills this means zero findings instead of a wall of false positives. The report will note that AI analysis was not completed.',
+    },
+    {
+        q: 'Do I need an account?',
+        a: 'No. Anonymous users can scan up to 5 public repos per hour. A free account increases the limit to 20 and adds a scan history dashboard.',
+    },
+    {
+        q: 'What platforms are supported?',
+        a: 'Claude Code, Cursor, Windsurf, Cline, OpenClaw, and any platform following the AgentSkills open standard. The platform is auto-detected from file paths and frontmatter.',
+    },
+    {
+        q: 'Can I scan private repositories?',
+        a: 'Not yet. Only public GitHub repositories are supported. Private repo scanning via GitHub OAuth is planned.',
+    },
+]
+
 export default function FAQs() {
     return (
-        <section className="scroll-py-16 py-12 md:scroll-py-12 md:py-12">
-            <div className="mx-auto max-w-5xl px-6">
-                <div className="grid gap-y-12 px-2 lg:[grid-template-columns:1fr_auto]">
-                    <div className="text-center lg:text-left">
-                        <h2 className="mb-4 text-3xl font-semibold md:text-4xl">
-                            Frequently <br className="hidden lg:block" /> Asked <br className="hidden lg:block" />
-                            Questions
-                        </h2>
-                        <p>Accusantium quisquam. Illo, omnis?</p>
-                    </div>
+        <section className="py-16 md:py-24 border-t border-gray-100 dark:border-border" id="faq">
+            <div className="mx-auto max-w-3xl px-6">
+                <h2 className="text-center text-2xl font-semibold text-gray-900 dark:text-foreground sm:text-3xl">
+                    Frequently asked questions
+                </h2>
 
-                    <div className="divide-y divide-dashed sm:mx-auto sm:max-w-lg lg:mx-0">
-                        <div className="pb-6">
-                            <h3 className="font-medium">What is the refund policy?</h3>
-                            <p className="text-muted-foreground mt-4">We offer a 30-day money back guarantee. If you are not satisfied with our product, you can request a refund within 30 days of your purchase.</p>
-
-                            <ol className="list-outside list-decimal space-y-2 pl-4">
-                                <li className="text-muted-foreground mt-4">To request a refund, please contact our support team with your order number and reason for the refund.</li>
-                                <li className="text-muted-foreground mt-4">Refunds will be processed within 3-5 business days.</li>
-                                <li className="text-muted-foreground mt-4">Please note that refunds are only available for new customers and are limited to one per customer.</li>
-                            </ol>
+                <div className="mt-12 divide-y divide-gray-100 dark:divide-border">
+                    {faqs.map((faq, i) => (
+                        <div key={i} className="py-6">
+                            <h3 className="font-medium text-gray-900 dark:text-foreground">{faq.q}</h3>
+                            <p className="mt-2 text-sm text-gray-600 dark:text-muted-foreground leading-relaxed">{faq.a}</p>
                         </div>
-                        <div className="py-6">
-                            <h3 className="font-medium">How do I cancel my subscription?</h3>
-                            <p className="text-muted-foreground mt-4">You can cancel your subscription at any time by logging into your account and clicking on the cancel button.</p>
-                        </div>
-                        <div className="py-6">
-                            <h3 className="font-medium">Can I upgrade my plan?</h3>
-                            <p className="text-muted-foreground my-4">Yes, you can upgrade your plan at any time by logging into your account and selecting the plan you want to upgrade to.</p>
-                            <ul className="list-outside list-disc space-y-2 pl-4">
-                                <li className="text-muted-foreground">You will be charged the difference in price between your current plan and the plan you are upgrading to.</li>
-                                <li className="text-muted-foreground">Your new plan will take effect immediately and you will be billed at the new rate on your next billing cycle.</li>
-                            </ul>
-                        </div>
-                        <div className="py-6">
-                            <h3 className="font-medium">Do you offer phone support?</h3>
-                            <p className="text-muted-foreground mt-4">We do not offer phone support at this time. However, you can contact us via email or live chat for any questions or concerns you may have.</p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </section>

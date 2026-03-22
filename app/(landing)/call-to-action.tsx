@@ -1,38 +1,29 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import PixelCard from '@/components/react-bits/pixel-card'
+import { IconArrowRight } from '@tabler/icons-react'
 
 export default function CallToAction() {
     return (
-        <section className="py-1 px-6">
-            <div className=" mx-auto max-w-5xl rounded-3xl px-6 py-1 md:py-2 lg:py-3">
-                <PixelCard variant="blue" className="w-full max-w-5xl h-auto aspect-[16/9]">
-                <div className="absolute text-center">
-                    <h2 className="text-balance text-4xl font-semibold lg:text-5xl">Start Building</h2>
-                    <p className="mt-4">Libero sapiente aliquam quibusdam aspernatur.</p>
-
-                    <div className="mt-12 flex flex-wrap justify-center gap-4">
-                        <Button
-                            asChild
-                            size="lg">
-                            <Link href="/">
-                                <span>Get Started</span>
-                            </Link>
-                        </Button>
-
-                        <Button
-                            asChild
-                            size="lg"
-                            variant="outline">
-                            <Link href="/">
-                                <span>Book Demo</span>
-                            </Link>
-                        </Button>
-                    </div>
+        <section className="py-16 md:py-24">
+            <div className="mx-auto max-w-2xl px-6 text-center">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground sm:text-3xl">
+                    Don&apos;t install blind
+                </h2>
+                <p className="mt-3 text-gray-600 dark:text-muted-foreground">
+                    Know what a skill does before it touches your filesystem, shell, and API keys.
+                </p>
+                <div className="mt-8">
+                    <Button
+                        asChild
+                        size="lg"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                        <Link href="/scan">
+                            Scan a Skill
+                            <IconArrowRight className="size-4 ml-1" />
+                        </Link>
+                    </Button>
                 </div>
-                </PixelCard>
             </div>
-            
         </section>
     )
 }

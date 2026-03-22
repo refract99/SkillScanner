@@ -1,55 +1,48 @@
-import React from 'react'
+'use client'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import Image from 'next/image'
 import { HeroHeader } from "./header"
-import { Sparkle } from 'lucide-react'
+import { IconArrowRight } from '@tabler/icons-react'
+
+const platforms = ['Claude Code', 'OpenClaw', 'Cursor', 'Windsurf', 'Cline']
 
 export default function HeroSection() {
     return (
         <>
             <HeroHeader />
             <main>
-                <section className="">
-                    <div className="pt-8 pb-4 md:pt-12 md:pb-6">
-                        <div className="relative z-10 mx-auto max-w-5xl pt-6 px-6 text-center">
-                            <div>
-                                <h1 className="mx-auto mt-6 max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-5xl">Build Secure Applications with {process.env.NEXT_PUBLIC_SITE_NAME || 'Secure Vibe Coding'}</h1>
-                                <p className="text-muted-foreground mx-auto mt-4 mb-5 max-w-xl text-balance text-xl">Real-time security monitoring and threat detection built into your Next.js applications.</p>
+                <section className="pt-24 pb-16 md:pt-32 md:pb-24">
+                    <div className="mx-auto max-w-3xl px-6 text-center">
+                        <p className="text-emerald-600 font-medium text-sm mb-4">Security analysis for AI agent skills</p>
+                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-gray-900 dark:text-foreground">
+                            Know what a skill does<br />before you install it
+                        </h1>
+                        <p className="mt-6 text-lg text-gray-600 dark:text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                            Paste a GitHub URL and get a security report in seconds. SkillScanner uses AI-first analysis across 10 threat categories with deterministic hard-stop checks &mdash; without executing any code.
+                        </p>
 
-                                <div className="flex items-center justify-center gap-3 mb-4">
-                                    <Button
-                                        asChild
-                                        size="lg">
-                                        <Link href="#link">
-                                            <span className="text-nowrap">Start Building</span>
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        asChild
-                                        size="lg"
-                                        variant="outline">
-                                        <Link href="#link">
-                                            <span className="text-nowrap">Watch Video</span>
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </div>
+                        <div className="mt-8 flex items-center justify-center gap-4">
+                            <Button
+                                asChild
+                                size="lg"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                                <Link href="/scan">
+                                    Scan a Skill
+                                    <IconArrowRight className="size-4 ml-1" />
+                                </Link>
+                            </Button>
                         </div>
-                        <div className="relative">
-                            <div className="relative z-10 mx-auto max-w-5xl px-6">
-                                <div className="">
-                                    <div className="bg-background rounded-(--radius) relative mx-auto overflow-hidden border border-transparent shadow-lg shadow-black/10 ring-1 ring-black/10">
-                                        <Image
-                                            src="/hero-section-main-app-dark.png"
-                                            alt="Secure Vibe Coding dashboard"
-                                            width={2856}
-                                            height={1798}
-                                            priority
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+
+                        <p className="mt-4 text-sm text-gray-500 dark:text-muted-foreground">
+                            Free &middot; No account required &middot; Public repos only
+                        </p>
+
+                        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                            {platforms.map((p) => (
+                                <span key={p} className="text-xs font-medium text-gray-500 dark:text-muted-foreground bg-gray-100 dark:bg-muted px-3 py-1.5 rounded-full">
+                                    {p}
+                                </span>
+                            ))}
                         </div>
                     </div>
                 </section>

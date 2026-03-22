@@ -21,6 +21,7 @@ import {
   IconSparkles,
   IconBrandOpenai,
   IconShieldCheck,
+  IconScan,
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/app/dashboard/nav-documents"
@@ -57,6 +58,11 @@ const data = {
       title: "Payment gated",
       url: "/dashboard/payment-gated",
       icon: IconSparkles,
+    },
+    {
+      title: "Skill Scanner",
+      url: "/dashboard/scans",
+      icon: IconScan,
     },
   ],
   // Admin-only navigation items

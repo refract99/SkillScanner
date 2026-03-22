@@ -51,3 +51,11 @@ course-outline.tsx.txt
 
 # Auto Claude data directory
 .auto-claude/
+
+# Secrets
+.secrets/
+*.key
+*.secret
+
+# IDE workspace files
+*.code-workspace
