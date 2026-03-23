@@ -51,7 +51,8 @@ export const batchInsertFindings = internalMutation({
           v.literal("external_links"),
           v.literal("ai_semantic"),
           v.literal("cross_platform"),
-          v.literal("secrets_detection")
+          v.literal("secrets_detection"),
+          v.literal("dependency_audit")
         ),
         ruleId: v.string(),
         severity: v.union(

@@ -11,7 +11,8 @@ export type ScanCategory =
   | "external_links"
   | "ai_semantic"
   | "cross_platform"
-  | "secrets_detection";
+  | "secrets_detection"
+  | "dependency_audit";
 
 export interface Finding {
   category: ScanCategory;
