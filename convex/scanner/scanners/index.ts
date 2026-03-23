@@ -8,6 +8,8 @@ export { runHardStopChecks } from "./hardStops";
 export type { HardStopResult } from "./hardStops";
 export { runCodePatternChecks } from "./codePatterns";
 export type { CodePatternResult } from "./codePatterns";
+export { runSecretsDetection } from "./secretsDetection";
+export type { SecretsDetectionResult } from "./secretsDetection";
 
 /** Calculate risk score from findings. Weights by severity and confidence.
  *  High confidence: full weight. Medium: 50%. Low: 25%. */

@@ -8,6 +8,7 @@ import {
   runPreFilter,
   runHardStopChecks,
   runCodePatternChecks,
+  runSecretsDetection,
   calculateRiskScore,
   riskLevel,
   generateSummary,
@@ -330,10 +331,11 @@ export async function runScanPipeline(
   // Stage 1: Pre-filter (fast, factual metadata)
   const preFilter = await runPreFilter(context);
 
-  // Stage 2: Hard-stops + code pattern checks (deterministic, non-dismissable)
-  const [hardStops, codePatterns] = await Promise.all([
+  // Stage 2: Hard-stops + code pattern checks + secrets detection (deterministic, non-dismissable)
+  const [hardStops, codePatterns, secretsResult] = await Promise.all([
     runHardStopChecks(context),
     runCodePatternChecks(context),
+    runSecretsDetection(context),
   ]);
 
   // Stage 3: AI-first analysis
@@ -360,6 +362,7 @@ export async function runScanPipeline(
   const allFindings = [
     ...hardStops.findings,
     ...codePatterns.findings,
+    ...secretsResult.findings,
     ...(aiResult?.findings ?? []),
     ...preFilter.complianceFindings,
     ...preFilter.platformFindings,
@@ -373,7 +376,7 @@ export async function runScanPipeline(
 
   if (aiResult && aiResult.riskScore >= 0) {
     // AI score + hard-stop boost
-    const deterministicFindings = [...hardStops.findings, ...codePatterns.findings];
+    const deterministicFindings = [...hardStops.findings, ...codePatterns.findings, ...secretsResult.findings];
     riskScore = Math.min(100, aiResult.riskScore + hardStopBoost(deterministicFindings));
     verdict = deterministicFindings.length > 0
       ? escalateVerdict(aiResult.verdict)
@@ -382,7 +385,7 @@ export async function runScanPipeline(
     aiSummary = aiResult.aiSummary;
   } else {
     // AI unavailable or unparseable: score from hard-stops only (0 for legitimate skills)
-    const deterministicOnly = [...hardStops.findings, ...codePatterns.findings];
+    const deterministicOnly = [...hardStops.findings, ...codePatterns.findings, ...secretsResult.findings];
     riskScore = calculateRiskScore(deterministicOnly);
     verdict = deterministicOnly.length > 0 ? "USE WITH CAUTION" : "SAFE TO USE";
     verdictReason = aiResult?.verdictReason

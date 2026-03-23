@@ -50,6 +50,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   external_links: "External Links",
   ai_semantic: "AI Semantic Review",
   cross_platform: "Cross-Platform",
+  secrets_detection: "Secrets Detection",
 };
 
 const SEVERITY_CONFIG: Record<string, { color: string; icon: typeof AlertTriangle }> = {

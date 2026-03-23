@@ -10,7 +10,8 @@ export type ScanCategory =
   | "bundled_payloads"
   | "external_links"
   | "ai_semantic"
-  | "cross_platform";
+  | "cross_platform"
+  | "secrets_detection";
 
 export interface Finding {
   category: ScanCategory;

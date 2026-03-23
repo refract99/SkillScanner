@@ -148,7 +148,8 @@ export default defineSchema({
         v.literal("bundled_payloads"),
         v.literal("external_links"),
         v.literal("ai_semantic"),
-        v.literal("cross_platform")
+        v.literal("cross_platform"),
+        v.literal("secrets_detection")
       ),
       ruleId: v.string(),
       severity: v.union(
