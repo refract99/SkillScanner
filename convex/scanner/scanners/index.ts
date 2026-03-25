@@ -12,6 +12,8 @@ export { runSecretsDetection } from "./secretsDetection";
 export type { SecretsDetectionResult } from "./secretsDetection";
 export { runDependencyAudit } from "./dependencyAudit";
 export type { DependencyAuditResult } from "./dependencyAudit";
+export { aggregateResults } from "./aggregateResults";
+export type { AggregatedScore, SourceContribution } from "./aggregateResults";
 
 /** Calculate risk score from findings. Weights by severity and confidence.
  *  High confidence: full weight. Medium: 50%. Low: 25%. */

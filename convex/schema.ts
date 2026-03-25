@@ -123,6 +123,22 @@ export default defineSchema({
       scanDurationMs: v.optional(v.number()),
       errorMessage: v.optional(v.string()),
       shareSlug: v.string(),
+      // Weighted aggregation metadata (Phase 2)
+      sourceBreakdown: v.optional(v.array(v.object({
+        source: v.string(),
+        label: v.string(),
+        weight: v.number(),
+        rawPoints: v.number(),
+        weightedPoints: v.number(),
+        findingCount: v.number(),
+      }))),
+      secretsCount: v.optional(v.number()),
+      secretsCriticalCount: v.optional(v.number()),
+      depVulnCount: v.optional(v.number()),
+      depCriticalCount: v.optional(v.number()),
+      depHighCount: v.optional(v.number()),
+      secretsBoostApplied: v.optional(v.boolean()),
+      cveBoostTotal: v.optional(v.number()),
       // Collection support: parent-child relationship for multi-skill repos
       collectionId: v.optional(v.id("scans")),
       skillName: v.optional(v.string()),

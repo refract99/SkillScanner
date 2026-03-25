@@ -24,6 +24,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Info,
+  KeyRound,
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useMemo } from "react";
@@ -51,6 +53,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   ai_semantic: "AI Semantic Review",
   cross_platform: "Cross-Platform",
   secrets_detection: "Secrets Detection",
+  dependency_audit: "Dependency Audit",
 };
 
 const SEVERITY_CONFIG: Record<string, { color: string; icon: typeof AlertTriangle }> = {
@@ -314,6 +317,59 @@ function ScanReport({
           );
         })}
       </div>
+
+      {/* Secrets & Dependency Badges */}
+      {((scan.secretsCount ?? 0) > 0 || (scan.depVulnCount ?? 0) > 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {(scan.secretsCount ?? 0) > 0 && (
+            <Card className={(scan.secretsCriticalCount ?? 0) > 0 ? "border-red-300 dark:border-red-800" : "border-yellow-300 dark:border-yellow-800"}>
+              <CardContent className="pt-4 pb-4 flex items-center gap-3">
+                <div className={(scan.secretsCriticalCount ?? 0) > 0 ? "p-2 rounded-full bg-red-100 dark:bg-red-900/40" : "p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/40"}>
+                  <KeyRound className={(scan.secretsCriticalCount ?? 0) > 0 ? "h-5 w-5 text-red-600 dark:text-red-400" : "h-5 w-5 text-yellow-600 dark:text-yellow-400"} />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">
+                    {scan.secretsCount} Secret{scan.secretsCount !== 1 ? "s" : ""} Detected
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(scan.secretsCriticalCount ?? 0) > 0
+                      ? `${scan.secretsCriticalCount} high/critical — credentials may be exposed`
+                      : "Lower severity findings — review recommended"}
+                    {scan.secretsBoostApplied && " · Minimum risk score applied"}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {(scan.depVulnCount ?? 0) > 0 && (
+            <Card className={(scan.depCriticalCount ?? 0) > 0 ? "border-red-300 dark:border-red-800" : "border-orange-300 dark:border-orange-800"}>
+              <CardContent className="pt-4 pb-4 flex items-center gap-3">
+                <div className={(scan.depCriticalCount ?? 0) > 0 ? "p-2 rounded-full bg-red-100 dark:bg-red-900/40" : "p-2 rounded-full bg-orange-100 dark:bg-orange-900/40"}>
+                  <Package className={(scan.depCriticalCount ?? 0) > 0 ? "h-5 w-5 text-red-600 dark:text-red-400" : "h-5 w-5 text-orange-600 dark:text-orange-400"} />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">
+                    {scan.depVulnCount} Known Vulnerabilit{scan.depVulnCount !== 1 ? "ies" : "y"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(scan.depCriticalCount ?? 0) > 0 && `${scan.depCriticalCount} critical`}
+                    {(scan.depCriticalCount ?? 0) > 0 && (scan.depHighCount ?? 0) > 0 && ", "}
+                    {(scan.depHighCount ?? 0) > 0 && `${scan.depHighCount} high`}
+                    {((scan.depCriticalCount ?? 0) > 0 || (scan.depHighCount ?? 0) > 0) && " severity — "}
+                    update dependencies to patch
+                    {(scan.cveBoostTotal ?? 0) > 0 && ` · +${scan.cveBoostTotal} CVE boost applied`}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Risk Breakdown by Source */}
+      {scan.sourceBreakdown && scan.sourceBreakdown.length > 0 && (
+        <RiskBreakdown sourceBreakdown={scan.sourceBreakdown} />
+      )}
 
       {/* Findings by Category — Donut Chart */}
       {hasFindings && (
@@ -682,6 +738,67 @@ function CategoryDonut({
             ))}
           </div>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Risk breakdown by scanner source (horizontal bar chart)
+// ---------------------------------------------------------------------------
+
+const SOURCE_BAR_COLORS: Record<string, string> = {
+  hard_stop: "bg-red-500",
+  secrets_detection: "bg-orange-500",
+  dependency_audit: "bg-amber-500",
+  dependency_risks: "bg-yellow-500",
+  standard_compliance: "bg-yellow-500",
+  cross_platform: "bg-yellow-500",
+  ai_semantic: "bg-blue-500",
+  external_links: "bg-gray-400",
+};
+
+function RiskBreakdown({
+  sourceBreakdown,
+}: {
+  sourceBreakdown: Array<{
+    source: string;
+    label: string;
+    weight: number;
+    rawPoints: number;
+    weightedPoints: number;
+    findingCount: number;
+  }>;
+}) {
+  const maxPoints = Math.max(...sourceBreakdown.map((s) => s.weightedPoints), 1);
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg">Risk Breakdown by Source</CardTitle>
+        <CardDescription>Contribution of each scanner to the overall risk score (weighted)</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {sourceBreakdown.map((src) => {
+          const pct = (src.weightedPoints / maxPoints) * 100;
+          const barColor = SOURCE_BAR_COLORS[src.source] || "bg-gray-400";
+          return (
+            <div key={src.source} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">{src.label}</span>
+                <span className="text-muted-foreground text-xs">
+                  {src.findingCount} finding{src.findingCount !== 1 ? "s" : ""} · {Math.round(src.weightedPoints)} pts (×{src.weight})
+                </span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${barColor}`}
+                  style={{ width: `${Math.max(pct, 2)}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );

@@ -147,6 +147,21 @@ export const completeScan = internalMutation({
     totalFindings: v.number(),
     scanDurationMs: v.number(),
     commitHash: v.optional(v.string()),
+    sourceBreakdown: v.optional(v.array(v.object({
+      source: v.string(),
+      label: v.string(),
+      weight: v.number(),
+      rawPoints: v.number(),
+      weightedPoints: v.number(),
+      findingCount: v.number(),
+    }))),
+    secretsCount: v.optional(v.number()),
+    secretsCriticalCount: v.optional(v.number()),
+    depVulnCount: v.optional(v.number()),
+    depCriticalCount: v.optional(v.number()),
+    depHighCount: v.optional(v.number()),
+    secretsBoostApplied: v.optional(v.boolean()),
+    cveBoostTotal: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const update: Record<string, unknown> = {
@@ -169,6 +184,30 @@ export const completeScan = internalMutation({
     }
     if (args.verdictReason !== undefined) {
       update.verdictReason = args.verdictReason;
+    }
+    if (args.sourceBreakdown !== undefined) {
+      update.sourceBreakdown = args.sourceBreakdown;
+    }
+    if (args.secretsCount !== undefined) {
+      update.secretsCount = args.secretsCount;
+    }
+    if (args.secretsCriticalCount !== undefined) {
+      update.secretsCriticalCount = args.secretsCriticalCount;
+    }
+    if (args.depVulnCount !== undefined) {
+      update.depVulnCount = args.depVulnCount;
+    }
+    if (args.depCriticalCount !== undefined) {
+      update.depCriticalCount = args.depCriticalCount;
+    }
+    if (args.depHighCount !== undefined) {
+      update.depHighCount = args.depHighCount;
+    }
+    if (args.secretsBoostApplied !== undefined) {
+      update.secretsBoostApplied = args.secretsBoostApplied;
+    }
+    if (args.cveBoostTotal !== undefined) {
+      update.cveBoostTotal = args.cveBoostTotal;
     }
     await ctx.db.patch(args.scanId, update);
   },

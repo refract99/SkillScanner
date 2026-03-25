@@ -13,7 +13,9 @@ import {
   calculateRiskScore,
   riskLevel,
   generateSummary,
+  aggregateResults,
 } from "./scanners/index";
+import type { SourceContribution } from "./scanners/index";
 import { aiFirstReview, AiFirstResult } from "./scanners/aiFirstReview";
 import * as fs from "fs";
 import * as path from "path";
@@ -371,33 +373,50 @@ export async function runScanPipeline(
     ...preFilter.platformFindings,
   ];
 
-  // Scoring
+  // Weighted aggregation scoring
+  const aggregated = aggregateResults(allFindings);
+
   let riskScore: number;
   let verdict: "SAFE TO USE" | "USE WITH CAUTION" | "DO NOT USE" | undefined;
   let verdictReason: string | undefined;
   let aiSummary: string | undefined;
 
   if (aiResult && aiResult.riskScore >= 0) {
-    // AI score + hard-stop boost
+    // AI score + hard-stop boost, then take the higher of AI or weighted score
     const deterministicFindings = [...hardStops.findings, ...codePatterns.findings, ...secretsResult.findings, ...dependencyAuditResult.findings];
-    riskScore = Math.min(100, aiResult.riskScore + hardStopBoost(deterministicFindings));
+    const aiAdjustedScore = Math.min(100, aiResult.riskScore + hardStopBoost(deterministicFindings));
+    riskScore = Math.max(aiAdjustedScore, aggregated.score);
     verdict = deterministicFindings.length > 0
       ? escalateVerdict(aiResult.verdict)
       : aiResult.verdict;
     verdictReason = aiResult.verdictReason;
     aiSummary = aiResult.aiSummary;
   } else {
-    // AI unavailable or unparseable: score from hard-stops only (0 for legitimate skills)
-    const deterministicOnly = [...hardStops.findings, ...codePatterns.findings, ...secretsResult.findings];
-    riskScore = calculateRiskScore(deterministicOnly);
-    verdict = deterministicOnly.length > 0 ? "USE WITH CAUTION" : "SAFE TO USE";
+    // AI unavailable: use weighted aggregation score
+    riskScore = aggregated.score;
+    verdict = allFindings.length > 0 ? "USE WITH CAUTION" : "SAFE TO USE";
     verdictReason = aiResult?.verdictReason
-      || "AI analysis unavailable. Only deterministic hard-stop checks applied.";
+      || "AI analysis unavailable. Weighted aggregation scoring applied.";
     aiSummary = aiResult?.aiSummary || "AI analysis was not completed.";
   }
 
   const risk = riskLevel(riskScore);
   const summary = generateSummary(allFindings, preFilter.platform, riskScore);
+
+  // Count secrets and dependency findings for UI metadata
+  const secretsCount = secretsResult.findings.length;
+  const secretsCriticalCount = secretsResult.findings.filter(
+    (f) => f.severity === "critical" || f.severity === "high"
+  ).length;
+  const depVulnCount = dependencyAuditResult.findings.filter(
+    (f) => f.ruleId === "DA001"
+  ).length;
+  const depCriticalCount = dependencyAuditResult.findings.filter(
+    (f) => f.ruleId === "DA001" && f.severity === "critical"
+  ).length;
+  const depHighCount = dependencyAuditResult.findings.filter(
+    (f) => f.ruleId === "DA001" && f.severity === "high"
+  ).length;
 
   return {
     findings: allFindings,
@@ -412,6 +431,14 @@ export async function runScanPipeline(
     verdict,
     verdictReason,
     fileCount: files.length,
+    sourceBreakdown: aggregated.sourceBreakdown,
+    secretsBoostApplied: aggregated.secretsBoostApplied,
+    cveBoostTotal: aggregated.cveBoostTotal,
+    secretsCount,
+    secretsCriticalCount,
+    depVulnCount,
+    depCriticalCount,
+    depHighCount,
   };
 }
 
@@ -423,7 +450,7 @@ export async function storeScanResults(
   startTime: number,
   commitHash?: string
 ) {
-  const { findings, links, platform, riskScore, risk, summary, aiSummary, verdict, verdictReason, adjustedRiskScore, fileCount } = results;
+  const { findings, links, platform, riskScore, risk, summary, aiSummary, verdict, verdictReason, adjustedRiskScore, fileCount, sourceBreakdown, secretsCount, secretsCriticalCount, depVulnCount, depCriticalCount, depHighCount, secretsBoostApplied, cveBoostTotal } = results;
 
   for (let i = 0; i < findings.length; i += 100) {
     const batch = findings.slice(i, i + 100).map((f) => ({
@@ -475,6 +502,14 @@ export async function storeScanResults(
     totalFindings: findings.length,
     scanDurationMs: Date.now() - startTime,
     commitHash,
+    sourceBreakdown,
+    secretsCount,
+    secretsCriticalCount,
+    depVulnCount,
+    depCriticalCount,
+    depHighCount,
+    secretsBoostApplied,
+    cveBoostTotal,
   });
 }
 
