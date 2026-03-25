@@ -131,3 +131,35 @@ export const deleteScan = query({
     return true;
   },
 });
+
+export const getUserFindingStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) return [];
+    const scans = await ctx.db
+      .query("scans")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .collect();
+    const scanIds = scans.map((s) => s._id);
+    const result: { category: string; severity: string; count: number }[] = [];
+    const tally: Record<string, Record<string, number>> = {};
+    for (const scanId of scanIds) {
+      const findings = await ctx.db
+        .query("scanFindings")
+        .withIndex("by_scanId", (q) => q.eq("scanId", scanId))
+        .collect();
+      for (const f of findings) {
+        if (f.dismissed) continue;
+        if (!tally[f.category]) tally[f.category] = {};
+        tally[f.category][f.severity] = (tally[f.category][f.severity] || 0) + 1;
+      }
+    }
+    for (const category of Object.keys(tally)) {
+      for (const severity of Object.keys(tally[category])) {
+        result.push({ category, severity, count: tally[category][severity] });
+      }
+    }
+    return result;
+  },
+});
