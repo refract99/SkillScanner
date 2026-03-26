@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { HeroHeader } from "./header"
 import { IconArrowRight } from '@tabler/icons-react'
+import { Authenticated, Unauthenticated } from "convex/react"
+import { SignInButton, SignUpButton } from "@clerk/nextjs"
 
 const platforms = ['Claude Code', 'OpenClaw', 'Cursor', 'Windsurf', 'Cline']
 
@@ -22,19 +24,34 @@ export default function HeroSection() {
                         </p>
 
                         <div className="mt-8 flex items-center justify-center gap-4">
-                            <Button
-                                asChild
-                                size="lg"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
-                                <Link href="/scan">
-                                    Scan a Skill
-                                    <IconArrowRight className="size-4 ml-1" />
-                                </Link>
-                            </Button>
+                            <Authenticated>
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                                    <Link href="/scan">
+                                        Scan a Skill
+                                        <IconArrowRight className="size-4 ml-1" />
+                                    </Link>
+                                </Button>
+                            </Authenticated>
+                            <Unauthenticated>
+                                <SignUpButton mode="modal">
+                                    <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                                        Get Started Free
+                                        <IconArrowRight className="size-4 ml-1" />
+                                    </Button>
+                                </SignUpButton>
+                                <SignInButton mode="modal">
+                                    <Button size="lg" variant="outline">
+                                        Sign In
+                                    </Button>
+                                </SignInButton>
+                            </Unauthenticated>
                         </div>
 
                         <p className="mt-4 text-sm text-gray-500 dark:text-muted-foreground">
-                            Free &middot; No account required &middot; Public repos only
+                            5 free scans &middot; Account required &middot; Public repos only
                         </p>
 
                         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">

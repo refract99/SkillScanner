@@ -1,6 +1,9 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { IconArrowRight } from '@tabler/icons-react'
+import { Authenticated, Unauthenticated } from "convex/react"
+import { SignUpButton } from "@clerk/nextjs"
 
 export default function CallToAction() {
     return (
@@ -13,15 +16,25 @@ export default function CallToAction() {
                     Know what a skill does before it touches your filesystem, shell, and API keys.
                 </p>
                 <div className="mt-8">
-                    <Button
-                        asChild
-                        size="lg"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
-                        <Link href="/scan">
-                            Scan a Skill
-                            <IconArrowRight className="size-4 ml-1" />
-                        </Link>
-                    </Button>
+                    <Authenticated>
+                        <Button
+                            asChild
+                            size="lg"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                            <Link href="/scan">
+                                Scan a Skill
+                                <IconArrowRight className="size-4 ml-1" />
+                            </Link>
+                        </Button>
+                    </Authenticated>
+                    <Unauthenticated>
+                        <SignUpButton mode="modal">
+                            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                                Get Started Free
+                                <IconArrowRight className="size-4 ml-1" />
+                            </Button>
+                        </SignUpButton>
+                    </Unauthenticated>
                 </div>
             </div>
         </section>

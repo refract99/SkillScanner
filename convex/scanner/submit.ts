@@ -1,7 +1,9 @@
 import { v } from "convex/values";
 import { mutation, internalMutation } from "../_generated/server";
 import { internal } from "../_generated/api";
-import { getCurrentUser } from "../users";
+import { getCurrentUserOrThrowForMutation } from "../users";
+
+const FREE_SCAN_LIMIT = 5;
 
 function generateSlug(): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -78,6 +80,24 @@ export const submitScan = mutation({
       parsed.path = parentDir || undefined;
     }
 
+    // Require authentication
+    const user = await getCurrentUserOrThrowForMutation(ctx);
+
+    // Enforce free scan limit for non-admin users
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const isAdmin = adminEmail && user.email?.toLowerCase() === adminEmail.toLowerCase();
+    if (!isAdmin) {
+      const userScans = await ctx.db
+        .query("scans")
+        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .collect();
+      if (userScans.length >= FREE_SCAN_LIMIT) {
+        throw new Error(
+          `Free scan limit reached (${FREE_SCAN_LIMIT} scans). Upgrade to a paid plan to continue scanning.`
+        );
+      }
+    }
+
     // Dedup: same URL within 5 minutes returns existing scan
     const fiveMinAgo = Date.now() - 5 * 60 * 1000;
     const existing = await ctx.db
@@ -90,9 +110,6 @@ export const submitScan = mutation({
       return { scanId: existing._id, shareSlug: existing.shareSlug };
     }
 
-    // Get user if authenticated
-    const user = await getCurrentUser(ctx);
-
     const shareSlug = generateSlug();
 
     const scanId = await ctx.db.insert("scans", {
@@ -101,7 +118,7 @@ export const submitScan = mutation({
       repoName: parsed.repo,
       repoPath: parsed.path,
       branch: parsed.branch,
-      userId: user?._id,
+      userId: user._id,
       status: "pending",
       shareSlug,
     });
