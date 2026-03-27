@@ -20,7 +20,7 @@ export default function HeroSection() {
                             Know what a skill does<br />before you install it
                         </h1>
                         <p className="mt-6 text-lg text-gray-600 dark:text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                            Paste a GitHub URL and get a security report in seconds. SkillScanner uses AI-first analysis across 10 threat categories with deterministic hard-stop checks &mdash; without executing any code.
+                            SkillScanner uses AI-first analysis across 10 threat categories with deterministic hard-stop checks &mdash; without executing any code. Sign up free and get a full security report in seconds.
                         </p>
 
                         <div className="mt-8 flex items-center justify-center gap-4">
@@ -29,8 +29,8 @@ export default function HeroSection() {
                                     asChild
                                     size="lg"
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
-                                    <Link href="/scan">
-                                        Scan a Skill
+                                    <Link href="/dashboard">
+                                        Go to Dashboard
                                         <IconArrowRight className="size-4 ml-1" />
                                     </Link>
                                 </Button>
@@ -51,7 +51,7 @@ export default function HeroSection() {
                         </div>
 
                         <p className="mt-4 text-sm text-gray-500 dark:text-muted-foreground">
-                            5 free scans &middot; Account required &middot; Public repos only
+                            Free &middot; Sign up in seconds &middot; Public repos
                         </p>
 
                         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">

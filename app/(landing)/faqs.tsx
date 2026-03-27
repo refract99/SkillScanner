@@ -17,7 +17,7 @@ const faqs = [
     },
     {
         q: 'Do I need an account?',
-        a: 'No. Anonymous users can scan up to 5 public repos per hour. A free account increases the limit to 20 and adds a scan history dashboard.',
+        a: 'Yes. A free account is required to use SkillScanner. Sign up in seconds to start scanning skills and access your scan history dashboard.',
     },
     {
         q: 'What platforms are supported?',

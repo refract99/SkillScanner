@@ -1,6 +1,11 @@
-import { IconLink, IconSearch, IconFileCheck } from '@tabler/icons-react'
+import { IconLink, IconSearch, IconFileCheck, IconUserCheck } from '@tabler/icons-react'
 
 const steps = [
+    {
+        icon: IconUserCheck,
+        title: 'Sign up free',
+        desc: 'Create a free account in seconds. No credit card required.',
+    },
     {
         icon: IconLink,
         title: 'Paste a URL',
@@ -29,7 +34,7 @@ export default function HowItWorks() {
                     From GitHub URL to security report in under 60 seconds.
                 </p>
 
-                <div className="mt-14 grid gap-12 md:grid-cols-3">
+                <div className="mt-14 grid gap-12 sm:grid-cols-2 md:grid-cols-4">
                     {steps.map((s, i) => (
                         <div key={i} className="text-center">
                             <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/30">
