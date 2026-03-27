@@ -5,14 +5,19 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
 function getPageTitle(pathname: string): string {
-  // Handle exact matches first
   switch (pathname) {
     case "/dashboard":
       return "Dashboard"
+    case "/dashboard/scans":
+      return "Skill Scanner"
+    case "/dashboard/security":
+      return "Security Monitoring"
     case "/dashboard/payment-gated":
-      return "Payment gated"
+      return "Advanced Features"
+    case "/dashboard/admin/users":
+      return "User Management"
     default:
-      return "Page"
+      return "Dashboard"
   }
 }
 
